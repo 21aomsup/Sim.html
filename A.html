@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Robot Line Follower Simulator</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f4f4f4; }
+        canvas { background-color: white; border: 2px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 20px; }
+        .controls { margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #333; color: white; border: none; border-radius: 4px; }
+        button:hover { background-color: #555; }
+    </style>
+</head>
+<body>
+
+    <h1>จำลองหุ่นยนต์เดินตามเส้น</h1>
+
+    <div class="controls">
+        <button onclick="startSimulation()">เริ่มทำงาน</button>
+        <button onclick="resetSimulation()">รีเซ็ต</button>
+    </div>
+
+    <canvas id="simCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let robot = {
+            x: 50,
+            y: 200,
+            width: 40,
+            height: 30,
+            angle: 0,
+            speed: 2,
+            isMoving: false
+        };
+
+        function drawTrack() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // วาดเส้นดำ
+            ctx.beginPath();
+            ctx.moveTo(50, 200);
+            ctx.quadraticCurveTo(200, 50, 400, 200);
+            ctx.quadraticCurveTo(600, 350, 750, 200);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+        }
+
+        function drawRobot() {
+            ctx.save();
+            ctx.translate(robot.x, robot.y);
+            ctx.rotate(robot.angle);
+            ctx.fillStyle = 'red';
+            ctx.fillRect(-robot.width/2, -robot.height/2, robot.width, robot.height);
+            // เซนเซอร์
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(-5, -robot.height/2 - 5, 10, 5);
+            ctx.restore();
+        }
+
+        function update() {
+            if (robot.isMoving) {
+                // ตัวอย่างการจำลองการเลี้ยวตามเส้น
+                if (robot.x < 200) {
+                    robot.angle += 0.01;
+                } else if (robot.x < 400) {
+                    robot.angle -= 0.01;
+                } else if (robot.x < 600) {
+                    robot.angle += 0.01;
+                } else {
+                    robot.angle -= 0.01;
+                }
+                
+                robot.x += Math.cos(robot.angle) * robot.speed;
+                robot.y += Math.sin(robot.angle) * robot.speed;
+            }
+        }
+
+        function animate() {
+            update();
+            drawTrack();
+            drawRobot();
+            requestAnimationFrame(animate);
+        }
+
+        function startSimulation() {
+            robot.isMoving = true;
+        }
+
+        function resetSimulation() {
+            robot.isMoving = false;
+            robot.x = 50;
+            robot.y = 200;
+            robot.angle = 0;
+        }
+
+        animate();
+    </script>
+</body>
+</html>
